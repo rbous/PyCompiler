@@ -38,11 +38,11 @@ enum class TokenType {
 
 class Token {
     public:
-        char text;
+        string text;
         TokenType kind;
 
         // Constructor
-        Token(char tokenText, TokenType tokenKind) {
+        Token(string tokenText, TokenType tokenKind) {
             text = tokenText;
             kind = tokenKind;
         };
@@ -105,7 +105,12 @@ class Lexer {
 
         // Return the next token
         Token getToken(void) {
+            skipWhitespace();
+            skipComment();
+
             TokenType type;
+            string curString = "";
+            curString += curChar;
 
             switch (curChar) 
             {
@@ -116,16 +121,57 @@ class Lexer {
                 type = TokenType::MINUS;
                 break;
             case '*':
-                type =  TokenType::ASTERISK;
+                type = TokenType::ASTERISK;
                 break;
             case '/':
-                type =  TokenType::SLASH;
+                type = TokenType::SLASH;
                 break;
             case '\n':
                 type = TokenType::NEWLINE;
                 break;
             case '\0':
-                type =  TokenType::ENDOFLINE;
+                type = TokenType::ENDOFLINE;
+                break;
+            case '=':
+                // check if token is = or ==
+                if (peek() == '=') {
+                    nextChar();
+                    curString += curChar;
+                    type = TokenType::EQEQ;
+                } else {
+                    type = TokenType::EQ;
+                }
+                break;
+            case '>':
+                // check if token is > or >=
+                if (peek() == '=') {
+                    nextChar();
+                    curString += curChar;
+                    type = TokenType::GTEQ;
+                } else {
+                    type = TokenType::GT;
+                }
+                break;
+            case '<':
+                // check if token is > or >=
+                if (peek() == '=') {
+                    nextChar();
+                    curString += curChar;
+                    type = TokenType::LTEQ;
+                } else {
+                    type = TokenType::LT;
+                }
+                break;
+            case '!':
+                if (peek() == '=') {
+                    nextChar();
+                    curString += curChar;
+                    type = TokenType::NOTEQ;
+                } else {
+                    string msg = "Expected !=, got !";
+                    msg += peek();
+                    abort(msg);
+                }
                 break;
             default:
                 string msg = "Unknown token: ";
@@ -133,7 +179,7 @@ class Lexer {
                 abort(msg);
             }
 
-            Token token = Token(curChar, type);
+            Token token = Token(curString, type);
             nextChar();
             return token;
         }
@@ -143,7 +189,7 @@ class Lexer {
 
 
 int main(void) {
-    string source = "+- */";
+    string source = "+- # This is a comment!\n */";
     Lexer lexer = Lexer(source);
 
     Token token = lexer.getToken();
