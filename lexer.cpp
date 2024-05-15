@@ -111,6 +111,8 @@ class Lexer {
             TokenType type;
             string curString = "";
             curString += curChar;
+            int startPos = curPos;
+            int charCount = 1;
 
             switch (curChar) 
             {
@@ -173,6 +175,23 @@ class Lexer {
                     abort(msg);
                 }
                 break;
+            case '\"':
+                // Get characters between quotations
+                nextChar();
+                
+                while (curChar != '\"') {
+                    // No escape characters, newlines, tabs, or % in the string (because of C's printf)
+                    if (curChar == '\r'|| curChar == '\n' || curChar == '\t' || curChar == '\\' || curChar == '%') {
+                        abort("Illegal character in string.");
+                    }
+                    nextChar();
+                    charCount++;
+                }
+                curString = source.substr(startPos, charCount + 1);
+                type = TokenType::STRING;
+                break;
+
+
             default:
                 string msg = "Unknown token: ";
                 msg += curChar;
@@ -189,7 +208,7 @@ class Lexer {
 
 
 int main(void) {
-    string source = "+- # This is a comment!\n */";
+    string source = "+- \"This is a string\" # This is a comment!\n */";
     Lexer lexer = Lexer(source);
 
     Token token = lexer.getToken();
