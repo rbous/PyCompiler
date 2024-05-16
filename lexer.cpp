@@ -193,9 +193,36 @@ class Lexer {
 
 
             default:
-                string msg = "Unknown token: ";
-                msg += curChar;
-                abort(msg);
+
+                // Leading character is a digit, so this must be a number.
+                // Get all consecutive digits and decimal if there is one.
+                if (isdigit(curChar))
+                {
+                    startPos = curPos;
+                    while (isdigit(peek())) {
+                        nextChar();
+                        charCount++;
+                    }
+                    if (peek() == '.') { // decimal
+                        nextChar();
+                        charCount++;
+                        // Must have at least one digit after decimal.
+                        if (!isdigit(peek())) {
+                            abort("Illegal character in number.");
+                        }
+                        while (isdigit(peek())) {
+                            nextChar();
+                            charCount++;
+                        }
+                    }
+                    curString = source.substr(startPos, charCount);
+                    type = TokenType::NUMBER;
+                    
+                } else {
+                    string msg = "Unknown token: ";
+                    msg += curChar;
+                    abort(msg);
+                }
             }
 
             Token token = Token(curString, type);
@@ -208,7 +235,7 @@ class Lexer {
 
 
 int main(void) {
-    string source = "+- \"This is a string\" # This is a comment!\n */";
+    string source = "+-123 9.8654*/";
     Lexer lexer = Lexer(source);
 
     Token token = lexer.getToken();
