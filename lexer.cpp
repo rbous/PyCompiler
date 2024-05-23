@@ -19,6 +19,10 @@ enum class TokenType {
 	IDENT = 2,
 	STRING = 3,
 
+    INT = 4,
+    STR = 5,
+    BOOL = 6,
+
     // Keywords
     FALSE = 101,
     NONE = 102,
@@ -46,7 +50,7 @@ enum class TokenType {
 	PLUS = 202,
 	MINUS = 203,
 	ASTERISK = 204,
-	SLASH = 205,
+	DBLSLASH = 205,
 	EQEQ = 206,
 	NOTEQ = 207,
 	LT = 208,
@@ -62,11 +66,11 @@ enum class TokenType {
     DOT = 218,
     ARROW = 219,
     MODULUS = 220,
-    DBLSLASH = 221,
 
 };
 
 std::unordered_map<string, TokenType> keywords = {
+
     {"False", TokenType::FALSE},
     {"True", TokenType::TRUE},
     {"None", TokenType::NONE},
@@ -104,6 +108,7 @@ std::unordered_map<string, TokenType> keywords = {
     {"try", TokenType::SYNTAXERROR},
     {"with", TokenType::SYNTAXERROR},
     {"yield", TokenType::SYNTAXERROR},
+    
 };
 
 
@@ -196,20 +201,60 @@ class Lexer {
             case '+':
                 type = TokenType::PLUS;
                 break;
-            case '-':
-                type = TokenType::MINUS;
-                break;
             case '*':
                 type = TokenType::ASTERISK;
-                break;
-            case '/':
-                type = TokenType::SLASH;
                 break;
             case '\n':
                 type = TokenType::NEWLINE;
                 break;
             case '\0':
                 type = TokenType::ENDOFLINE;
+                break;
+            case '%':
+                type = TokenType::MODULUS;
+                break;
+            case '(':
+                type = TokenType::LEFTPRNTH;
+                break;
+            case ')':
+                type = TokenType::RIGHTPRNTH;
+                break;
+            case '[':
+                type = TokenType::LEFTBRCKT;
+                break;
+            case ']':
+                type = TokenType::RIGHTBRCKT;
+                break;
+            case '.':
+                type = TokenType::DOT;
+                break;
+            case ':':
+                type = TokenType::COLON;
+                break;
+            case ',':
+                type = TokenType::COMMA;
+                break;
+            case '-':
+                // check if token is - or ->
+                if (peek() == '>') {
+                    nextChar();
+                    curString += curChar;
+                    type = TokenType::ARROW;
+                } else {
+                    type = TokenType::MINUS;
+                }
+                break;
+            case '/':
+                // check if token is / or invalid
+                if (peek() == '/') {
+                    nextChar();
+                    curString += curChar;
+                    type = TokenType::DBLSLASH;
+                } else {
+                    string msg = "Expected //, got /";
+                    msg += peek();
+                    abort(msg);
+                }
                 break;
             case '=':
                 // check if token is = or ==
@@ -232,7 +277,7 @@ class Lexer {
                 }
                 break;
             case '<':
-                // check if token is > or >=
+                // check if token is < or <=
                 if (peek() == '=') {
                     nextChar();
                     curString += curChar;
@@ -242,6 +287,7 @@ class Lexer {
                 }
                 break;
             case '!':
+                // check if token is != or invalid
                 if (peek() == '=') {
                     nextChar();
                     curString += curChar;
@@ -279,14 +325,7 @@ class Lexer {
                         nextChar();
                     }
                     if (peek() == '.') { // decimal
-                        nextChar();
-                        // Must have at least one digit after decimal.
-                        if (!isdigit(peek())) {
-                            abort("Illegal character in number.");
-                        }
-                        while (isdigit(peek())) {
-                            nextChar();
-                        }
+                        abort("Floating point numbers are not supported in ChocoPy");
                     }
                     curString = source.substr(startPos, curPos - startPos + 1);
                     type = TokenType::NUMBER;
@@ -294,10 +333,10 @@ class Lexer {
 
                 // Leading character is a letter, so this must be an identifier or a keyword.
                 // Get all consecutive alpha numeric characters.
-                } else if (isalpha(curChar)) {
+                } else if (isalpha(curChar) || curChar == '_') {
 
                     startPos = curPos;
-                    while (isalnum(peek())) {
+                    while (isalnum(peek()) || peek() == '_') {
                         nextChar();
                     }
 
@@ -320,11 +359,16 @@ class Lexer {
         }
 };
 
-
-
+/* TODO: 
+ *
+ *  indents/dedents
+ *  types (int, str, etc)
+ *  print, input, len
+ * 
+ */
 
 int main(void) {
-    string source = "+-123if \"bomboclaat\"9.8654*/";
+    string source = "if+async-123 foo_*then//";
     Lexer lexer = Lexer(source);
 
     Token token = lexer.getToken();
@@ -332,5 +376,4 @@ int main(void) {
         cout << static_cast<std::underlying_type<TokenType>::type>(token.kind) << "\t" << token.text << endl;
         token = lexer.getToken();
     }
-
 }
