@@ -7,24 +7,41 @@ using std::cout;
 using std::endl;
 
 enum class TokenType {
+
+    INDENT = -4,
+    DEDENT = -3,
+    
+    SYNTAXERROR = -2,
+
     ENDOFLINE = -1,
     NEWLINE = 0,
 	NUMBER = 1,
 	IDENT = 2,
 	STRING = 3,
+
     // Keywords
-    LABEL = 101,
-	GOTO = 102,
-	PRINT = 103,
-	INPUT = 104,
-	LET = 105,
-	IF = 106,
-	THEN = 107,
-	ENDIF = 108,
-	WHILE = 109,
-	REPEAT = 110,
-	ENDWHILE = 111,
-    // Operators (ADD OTHERS)
+    FALSE = 101,
+    NONE = 102,
+    TRUE = 103,
+    AND = 104,
+    AS = 105,
+    CLASS = 110,
+    DEF = 112,
+    ELIF = 114,
+    ELSE = 115,
+    FOR = 118,
+    GLOBAL = 120,
+    IF = 121,
+    IN = 123,
+    IS = 124,
+    NONLOCAL = 126,
+    NOT = 127,
+    OR = 128,
+    PASS = 129,
+    RETURN = 131,
+    WHILE = 133,
+
+    // Operators  
     EQ = 201,  
 	PLUS = 202,
 	MINUS = 203,
@@ -36,14 +53,57 @@ enum class TokenType {
 	LTEQ = 209,
 	GT = 210,
 	GTEQ = 211,
+    LEFTPRNTH = 212,
+    RIGHTPRNTH = 213,
+    LEFTBRCKT = 214,
+    RIGHTBRCKT = 215,
+    COMMA = 216,
+    COLON = 217,
+    DOT = 218,
+    ARROW = 219,
+    MODULUS = 220,
+    DBLSLASH = 221,
+
 };
 
 std::unordered_map<string, TokenType> keywords = {
+    {"False", TokenType::FALSE},
+    {"True", TokenType::TRUE},
+    {"None", TokenType::NONE},
+    {"and", TokenType::AND},
+    {"as", TokenType::AS},
+    {"class", TokenType::CLASS},
+    {"def", TokenType::DEF},
+    {"elif", TokenType::ELIF},
+    {"else", TokenType::ELSE},
+    {"for", TokenType::FOR},
+    {"global", TokenType::GLOBAL},
     {"if", TokenType::IF},
-  //  {"else", TokenType::ELSE},
-  //  {"return", TokenType::RETURN},
-  //  {"int", TokenType::INT},
-  //  {"float", TokenType::FLOAT}
+    {"in", TokenType::IN},
+    {"is", TokenType::IS},
+    {"nonlocal", TokenType::NONLOCAL},
+    {"not", TokenType::NOT},
+    {"or", TokenType::OR},
+    {"pass", TokenType::PASS},
+    {"return", TokenType::RETURN},
+    {"while", TokenType::WHILE},
+
+    // Illegal identifiers
+    {"assert", TokenType::SYNTAXERROR},
+    {"async", TokenType::SYNTAXERROR},
+    {"await", TokenType::SYNTAXERROR},
+    {"break", TokenType::SYNTAXERROR},
+    {"continue", TokenType::SYNTAXERROR},
+    {"del", TokenType::SYNTAXERROR},
+    {"except", TokenType::SYNTAXERROR},
+    {"finally", TokenType::SYNTAXERROR},
+    {"from", TokenType::SYNTAXERROR},
+    {"import", TokenType::SYNTAXERROR},
+    {"lambda", TokenType::SYNTAXERROR},
+    {"raise", TokenType::SYNTAXERROR},
+    {"try", TokenType::SYNTAXERROR},
+    {"with", TokenType::SYNTAXERROR},
+    {"yield", TokenType::SYNTAXERROR},
 };
 
 
