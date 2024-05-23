@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string>
+#include <unordered_map>
 
 using std::string;
 using std::cout;
@@ -35,6 +37,15 @@ enum class TokenType {
 	GT = 210,
 	GTEQ = 211,
 };
+
+std::unordered_map<string, TokenType> keywords = {
+    {"if", TokenType::IF},
+  //  {"else", TokenType::ELSE},
+  //  {"return", TokenType::RETURN},
+  //  {"int", TokenType::INT},
+  //  {"float", TokenType::FLOAT}
+};
+
 
 class Token {
     public:
@@ -101,6 +112,13 @@ class Lexer {
                     nextChar();
                 }
             }
+        }
+
+        static TokenType checkIfKeyword(string text) {
+            auto it = keywords.find(text);
+            if (it != keywords.end())
+                return it->second;
+            return TokenType::IDENT;
         }
 
         // Return the next token
@@ -194,8 +212,8 @@ class Lexer {
 
                 // Leading character is a digit, so this must be a number.
                 // Get all consecutive digits and decimal if there is one.
-                if (isdigit(curChar))
-                {
+                if (isdigit(curChar)) {
+
                     startPos = curPos;
                     while (isdigit(peek())) {
                         nextChar();
@@ -212,7 +230,23 @@ class Lexer {
                     }
                     curString = source.substr(startPos, curPos - startPos + 1);
                     type = TokenType::NUMBER;
-                    
+
+
+                // Leading character is a letter, so this must be an identifier or a keyword.
+                // Get all consecutive alpha numeric characters.
+                } else if (isalpha(curChar)) {
+
+                    startPos = curPos;
+                    while (isalnum(peek())) {
+                        nextChar();
+                    }
+
+                    // Check if the token is in the list of keywords.
+                    curString = source.substr(startPos, curPos - startPos + 1);
+                    type = Lexer::checkIfKeyword(curString);
+
+
+
                 } else {
                     string msg = "Unknown token: ";
                     msg += curChar;
@@ -230,7 +264,7 @@ class Lexer {
 
 
 int main(void) {
-    string source = "+-123 \"bomboclaat\"9.8654*/";
+    string source = "+-123if \"bomboclaat\"9.8654*/";
     Lexer lexer = Lexer(source);
 
     Token token = lexer.getToken();
