@@ -112,7 +112,6 @@ class Lexer {
             string curString = "";
             curString += curChar;
             int startPos = curPos;
-            int charCount = 1;
 
             switch (curChar) 
             {
@@ -185,9 +184,8 @@ class Lexer {
                         abort("Illegal character in string.");
                     }
                     nextChar();
-                    charCount++;
                 }
-                curString = source.substr(startPos, charCount + 1);
+                curString = source.substr(startPos, curPos - startPos + 1);
                 type = TokenType::STRING;
                 break;
 
@@ -201,21 +199,18 @@ class Lexer {
                     startPos = curPos;
                     while (isdigit(peek())) {
                         nextChar();
-                        charCount++;
                     }
                     if (peek() == '.') { // decimal
                         nextChar();
-                        charCount++;
                         // Must have at least one digit after decimal.
                         if (!isdigit(peek())) {
                             abort("Illegal character in number.");
                         }
                         while (isdigit(peek())) {
                             nextChar();
-                            charCount++;
                         }
                     }
-                    curString = source.substr(startPos, charCount);
+                    curString = source.substr(startPos, curPos - startPos + 1);
                     type = TokenType::NUMBER;
                     
                 } else {
@@ -235,12 +230,12 @@ class Lexer {
 
 
 int main(void) {
-    string source = "+-123 9.8654*/";
+    string source = "+-123 \"bomboclaat\"9.8654*/";
     Lexer lexer = Lexer(source);
 
     Token token = lexer.getToken();
     while (token.kind != TokenType::ENDOFLINE) {
-        cout << static_cast<std::underlying_type<TokenType>::type>(token.kind) << endl;
+        cout << static_cast<std::underlying_type<TokenType>::type>(token.kind) << "\t" << token.text << endl;
         token = lexer.getToken();
     }
 
