@@ -14,14 +14,14 @@ enum class TokenType {
 
     INDENT = -4,
     DEDENT = -3,
-    
+
     SYNTAXERROR = -2,
 
     ENDOFLINE = -1,
     NEWLINE = 0,
-	NUMBER = 1,
-	IDENT = 2,
-	STRING = 3,
+    NUMBER = 1,
+    IDENT = 2,
+    STRING = 3,
 
     INT = 4,
     STR = 5,
@@ -50,17 +50,17 @@ enum class TokenType {
     WHILE = 133,
 
     // Operators  
-    EQ = 201,  
-	PLUS = 202,
-	MINUS = 203,
-	ASTERISK = 204,
-	DBLSLASH = 205,
-	EQEQ = 206,
-	NOTEQ = 207,
-	LT = 208,
-	LTEQ = 209,
-	GT = 210,
-	GTEQ = 211,
+    EQ = 201, 
+    PLUS = 202,
+    MINUS = 203,
+    ASTERISK = 204,
+    DBLSLASH = 205,
+    EQEQ = 206,
+    NOTEQ = 207,
+    LT = 208,
+    LTEQ = 209,
+    GT = 210,
+    GTEQ = 211,
     LEFTPRNTH = 212,
     RIGHTPRNTH = 213,
     LEFTBRCKT = 214,
