@@ -223,9 +223,11 @@ class Lexer {
 
         // Return the next token
         Token getToken(void) {
+
             if (newLine) {
                 newLine = false;
                 int newPos = curPos;
+                skipWhitespace();
 
                 // Skip blank lines or lines with comments
                 while (curChar == '\n' || curChar == '\r') {
