@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 using std::string;
 using std::cout;
@@ -129,6 +130,8 @@ class Lexer {
         char curChar;
         int curPos;
         string source;
+        std::vector<int> indentStack;
+        bool newLine;
 
     public:
         // Constructor
@@ -136,11 +139,13 @@ class Lexer {
             source = s + "\n";
             curChar = ' ';
             curPos = -1;
+            indentStack.push_back(0);
+            newLine = true;
             nextChar();
         };
 
         // Process the next character
-        void nextChar(void) {
+        void nextChar() {
             curPos++;
             if (curPos >= source.length()) {
                 curChar = '\0';
@@ -150,7 +155,7 @@ class Lexer {
         }
         
         // Return the lookahead character
-        char peek(void) {
+        char peek() {
             if (curPos + 1 >= source.length()) {
                 return '\0';
             } 
@@ -164,14 +169,14 @@ class Lexer {
         }
 
         // Skip whitespace except newlines
-        void skipWhitespace(void) {
+        void skipWhitespace() {
             while (curChar == ' ' || curChar == '\t' || curChar == '\r') {
                 nextChar();
             }
         }
 
         // Skip comments in the code
-        void skipComment(void) {
+        void skipComment() {
             if (curChar == '#') {
                 while (curChar != '\n') {
                     nextChar();
@@ -186,8 +191,41 @@ class Lexer {
             return TokenType::IDENT;
         }
 
+        // Calculate the current indentation level
+        int calculateIndentation() {
+            int count;
+            for (count = 0; curChar == ' '; count++) {
+                nextChar();
+            }
+            return count;
+        }
+
+        // Handle indents and dedents
+        Token handleIndents() {
+            int curIndent = calculateIndentation();
+            // Indent
+            if (curIndent > indentStack.back()) {
+                indentStack.push_back(curIndent);
+                return Token("INDENT", TokenType::INDENT);
+            } 
+            // Dedent (may contain nested loops/if statements)
+            while (curIndent < indentStack.back()) {
+                indentStack.pop_back();
+                if (curIndent > indentStack.back()) {
+                    abort("Indentation error.");
+                }
+                return Token("DEDENT", TokenType::DEDENT);
+            }
+            return getToken();
+        }
+
         // Return the next token
         Token getToken(void) {
+            if (newLine) {
+                newLine = false;
+                return handleIndents();
+            }
+
             skipWhitespace();
             skipComment();
 
@@ -205,6 +243,7 @@ class Lexer {
                 type = TokenType::ASTERISK;
                 break;
             case '\n':
+                newLine = true;
                 type = TokenType::NEWLINE;
                 break;
             case '\0':
@@ -367,9 +406,16 @@ class Lexer {
  * 
  */
 
+#include <fstream>
+
 int main(void) {
-    string source = "if+async-123 foo_*then//";
-    Lexer lexer = Lexer(source);
+    
+    std::ifstream file("test.py");
+    string fileContent((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    file.close();
+
+    string source = "if+async-123 foo_  *   then//\n    yep\r\n        lmao   \n    if True";
+    Lexer lexer = Lexer(fileContent);
 
     Token token = lexer.getToken();
     while (token.kind != TokenType::ENDOFLINE) {
