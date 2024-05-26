@@ -212,10 +212,12 @@ class Lexer {
             while (curIndent < indentStack.back()) {
                 indentStack.pop_back();
                 if (curIndent > indentStack.back()) {
+                    cout << curIndent << " " << indentStack.back() << endl;
                     abort("Indentation error.");
                 }
                 return Token("DEDENT", TokenType::DEDENT);
             }
+            // None
             return getToken();
         }
 
@@ -223,7 +225,23 @@ class Lexer {
         Token getToken(void) {
             if (newLine) {
                 newLine = false;
-                return handleIndents();
+                int newPos = curPos;
+
+                // Skip blank lines or lines with comments
+                while (curChar == '\n' || curChar == '\r') {
+                    nextChar();
+                    newPos = curPos;
+                    skipWhitespace();
+                    skipComment();
+                }
+                // Go back to beginning of line to correctly calculate indentation
+                curPos = newPos;
+                curChar = source[curPos];
+
+                // If it's still a newline, handle indents
+                if (curChar != '\n' && curChar != '\0') {
+                    return handleIndents();
+                }
             }
 
             skipWhitespace();
