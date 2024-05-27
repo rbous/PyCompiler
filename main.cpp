@@ -1,16 +1,26 @@
 #include "lexer.hpp"
-
 #include <fstream>
 
-int main(void) {
+using std::cout;
+using std::endl;
+
+int main(int argc, char **argv) {
     
-    std::ifstream file("test.py");
+    cout << "This is PyCompiler!\n" << "-------------------" << endl;
+
+    // Ensure only 2 arguments
+    if (argc != 2) {
+        cout << "Error: Compiler needs source file as argument." << endl;
+        return 1;
+    }
+
+    // Get python file content
+    std::ifstream file(argv[1]);
     string fileContent((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
     file.close();
 
-    string source = "if+async-123 foo_  *   then//\n    yep\r\n        lmao   \n    if True";
+    // Print out every token
     Lexer lexer = Lexer(fileContent);
-
     Token token = lexer.getToken();
     while (token.kind != TokenType::ENDOFLINE) {
         std::cout << static_cast<std::underlying_type<TokenType>::type>(token.kind) << "\t" << token.text << std::endl;
