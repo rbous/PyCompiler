@@ -27,6 +27,10 @@ enum class TokenType {
     STR = 5,
     BOOL = 6,
 
+    PRINT = 7,
+    INPUT = 8,
+    LEN = 9,
+
     // Keywords
     FALSE = 101,
     NONE = 102,

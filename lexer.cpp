@@ -1,6 +1,7 @@
 #include "lexer.hpp"
 
 std::unordered_map<string, TokenType> keywords = {
+    // Keywords
     {"False", TokenType::FALSE},
     {"True", TokenType::TRUE},
     {"None", TokenType::NONE},
@@ -21,6 +22,13 @@ std::unordered_map<string, TokenType> keywords = {
     {"pass", TokenType::PASS},
     {"return", TokenType::RETURN},
     {"while", TokenType::WHILE},
+    // Others
+    {"int", TokenType::INT},
+    {"str", TokenType::STR},
+    {"bool", TokenType::BOOL},
+    {"print", TokenType::WHILE},
+    {"input", TokenType::INPUT},
+    {"len", TokenType::LEN},
     // Illegal identifiers
     {"assert", TokenType::SYNTAXERROR},
     {"async", TokenType::SYNTAXERROR},
