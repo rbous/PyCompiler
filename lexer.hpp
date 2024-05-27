@@ -7,7 +7,6 @@
 #include <vector>
 
 using std::string;
-using std::vector;
 
 // Enum class for Token Types
 enum class TokenType {
@@ -82,7 +81,9 @@ class Token {
 public:
     string text;
     TokenType kind;
+    
     Token(string tokenText, TokenType tokenKind);
+    Token();
 };
 
 // Lexer class
@@ -91,10 +92,12 @@ public:
     char curChar;
     int curPos;
     string source;
-    vector<int> indentStack;
+    std::vector<int> indentStack;
     bool newLine;
 
     Lexer(string s);
+    Lexer();
+
     void nextChar();
     char peek();
     void abort(string message);

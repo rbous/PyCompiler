@@ -54,6 +54,9 @@ Token::Token(string tokenText, TokenType tokenKind) {
     kind = tokenKind;
 }
 
+// Default token constructor
+Token::Token() = default;
+
 
 // Lexer class constructor
 Lexer::Lexer(string s) {
@@ -64,6 +67,9 @@ Lexer::Lexer(string s) {
     newLine = true;
     nextChar();
 }
+
+// Default lexer constructor
+Lexer::Lexer() = default;
 
 // Process the next character
 void Lexer::nextChar() {
@@ -326,10 +332,3 @@ Token Lexer::getToken() {
     nextChar();
     return Token(curString, type);
 }
-
-/* TODO: 
- *
- *  types (int, str, etc)
- *  print, input, len
- * 
- */
