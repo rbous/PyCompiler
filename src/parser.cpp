@@ -1,6 +1,9 @@
 #include "parser.hpp"
 #include "lexer.hpp"
 
+using std::cout;
+using std::endl;
+
 // Parser object keeps track of current token and checks if the code matches the grammar.
 
 // Constructor
@@ -44,4 +47,50 @@ void Parser::nextToken() {
 void Parser::abort(string message) {
     std::cout << "Error. " << message << std::endl;
     exit(2);
+}
+
+
+// Production rules
+
+// program ::= {statement}
+void Parser::program() {
+    cout << "PROGRAM" << endl;
+
+    // Parse all the statements in the program.
+    while (!checkToken(TokenType::ENDOFLINE)) {
+        statement();
+    }
+}
+
+// statement ::= "print" (expression | string) nl
+void Parser::statement() {
+    // Check the first token to see what kind of statement this is.
+
+    // "print" (expression | string)
+    if (checkToken(TokenType::PRINT)) {
+        cout << "STATEMENT-PRINT" << endl;
+        nextToken();
+
+        if (checkToken(TokenType::STRING)) {
+            // Simple string.
+            nextToken();
+        } else {
+            // Expect an expression
+            //expression();
+        }
+    }
+    // Newline
+    nl();
+}
+
+// nl ::= '\n'+
+void Parser::nl() {
+    cout << "NEWLINE" << endl;
+
+    // Require at least one newline.
+    match(TokenType::NEWLINE);
+    // Allow extra newlines too.
+    while (checkToken(TokenType::NEWLINE)) {
+        nextToken();
+    }
 }

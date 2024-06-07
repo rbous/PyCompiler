@@ -15,6 +15,11 @@ public:
     void match(TokenType kind);
     void nextToken();
     void abort(string message);
+
+    void program();
+    void statement();
+    void nl();
+ //   void expression();
 };
 
 #endif // PARSER_H
